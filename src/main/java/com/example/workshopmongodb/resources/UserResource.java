@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class UserResource {
     @Autowired
     private UserService service;
+
     @GetMapping
     public ResponseEntity<List<UserDTO>> findAll() {
         List<User> list = service.findAll();
@@ -25,22 +26,30 @@ public class UserResource {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<UserDTO> findById(@PathVariable String id){
+    public ResponseEntity<UserDTO> findById(@PathVariable String id) {
         User obj = service.findById(id);
         return ResponseEntity.ok().body(new UserDTO(obj));
     }
 
     @PostMapping
     public ResponseEntity<Void> insert(@RequestBody UserDTO objDto) {
-       User obj = service.fromDTO(objDto);
-       service.insert(obj);
+        User obj = service.fromDTO(objDto);
+        service.insert(obj);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
         return ResponseEntity.created(uri).build();
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id){
+    public ResponseEntity<Void> delete(@PathVariable String id) {
         service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<User> update(@PathVariable String id, @RequestBody UserDTO objDto) {
+        User obj = service.fromDTO(objDto);
+        obj.setId(id);
+        service.update(obj);
         return ResponseEntity.noContent().build();
     }
 
